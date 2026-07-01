@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISUAN · Instituto Superior Universitario Amado Nervo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --navy:   #0D1B2A;
+      --teal:   #1B6CA8;
+      --sky:    #4BA3C7;
+      --mint:   #A8D8C2;
+      --cream:  #F7F4EE;
+      --white:  #FFFFFF;
+      --muted:  #6B7A8D;
+      --border: #DDD9D0;
+      --serif:  'DM Serif Display', Georgia, serif;
+      --sans:   'Inter', system-ui, sans-serif;
+      --mono:   'Space Mono', monospace;
+      --radius: 2px;
+      --gap:    clamp(2rem, 5vw, 4rem);
+      --max:    1160px;
+    }
+
+    /* ── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--cream); color: var(--navy); line-height: 1.65; overflow-x: hidden; }
+    img  { max-width: 100%; display: block; }
+    a    { color: inherit; text-decoration: none; }
+    ul   { list-style: none; }
+
+    /* ── UTILS ──────────────────────────────────────────────────── */
+    .container { width: min(100%, var(--max)); margin-inline: auto; padding-inline: clamp(1.25rem, 4vw, 2.5rem); }
+    .label { font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+    /* ── NAV ────────────────────────────────────────────────────── */
+    .nav {
+      position: fixed; inset-block-start: 0; width: 100%; z-index: 100;
+      background: rgba(247,244,238,.92); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border); transition: box-shadow .3s;
+    }
+    .nav.scrolled { box-shadow: 0 2px 20px rgba(13,27,42,.08); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 2rem; }
+    .nav-logo  { display: flex; align-items: center; gap: .75rem; }
+    .nav-logo-mark {
+      width: 36px; height: 36px; background: var(--navy); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-mark span { font-family: var(--serif); font-size: .95rem; color: var(--mint); font-style: italic; }
+    .nav-brand { display: flex; flex-direction: column; line-height: 1.2; }
+    .nav-brand strong { font-weight: 600; font-size: .92rem; letter-spacing: .04em; color: var(--navy); }
+    .nav-brand small  { font-size: .65rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a { font-size: .82rem; font-weight: 500; color: var(--muted); letter-spacing: .02em; transition: color .2s; }
+    .nav-links a:hover { color: var(--navy); }
+    .nav-cta { background: var(--navy) !important; color: var(--cream) !important; padding: .45rem 1.1rem; border-radius: var(--radius); font-weight: 500 !important; transition: background .2s !important; }
+    .nav-cta:hover { background: var(--teal) !important; color: var(--white) !important; }
+    .burger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 6px; }
+    .burger span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; transition: transform .3s, opacity .3s; }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .mobile-menu { display: none; position: fixed; inset: 64px 0 0 0; z-index: 99; background: var(--cream); padding: 2rem; flex-direction: column; gap: 1.5rem; border-top: 1px solid var(--border); }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 1.1rem; font-weight: 500; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .mobile-menu .nav-cta { display: inline-block; text-align: center; padding: .75rem 1.5rem; }
+
+    /* ── HERO ───────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100svh;
+      display: grid; grid-template-rows: 1fr auto;
+      padding-top: 64px;
+      position: relative; overflow: hidden;
+    }
+    /* Hero background image */
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1600&q=80&auto=format&fit=crop');
+      background-size: cover; background-position: center 30%;
+      z-index: 0;
+    }
+    /* Overlay gradient for legibility */
+    .hero-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        105deg,
+        rgba(13,27,42,.88) 0%,
+        rgba(13,27,42,.72) 50%,
+        rgba(27,108,168,.35) 100%
+      );
+    }
+    /* signature vertical lines */
+    .hero::before, .hero::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(168,216,194,.5) 30%, rgba(75,163,199,.4) 70%, transparent);
+      pointer-events: none; z-index: 2;
+    }
+    .hero::before { left: 8%; }
+    .hero::after  { left: calc(8% + 18px); }
+    .hero-body { display: flex; align-items: center; padding-block: clamp(3rem,8vw,6rem); position: relative; z-index: 2; }
+    .hero-content { max-width: 680px; }
+    .hero-eyebrow { display: flex; align-items: center; gap: .75rem; margin-bottom: 1.5rem; }
+    .hero-eyebrow .label { color: var(--mint); }
+    .hero-eyebrow::before { content: ''; display: block; width: 2rem; height: 1px; background: var(--mint); }
+    .hero-title { font-family: var(--serif); font-size: clamp(2.6rem,6vw,4.8rem); line-height: 1.08; letter-spacing: -.02em; margin-bottom: 1.5rem; color: var(--white); }
+    .hero-title em { font-style: italic; color: var(--mint); }
+    .hero-desc { font-size: clamp(1rem,1.5vw,1.125rem); color: rgba(255,255,255,.78); font-weight: 300; max-width: 520px; margin-bottom: 2.5rem; line-height: 1.75; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+    .btn-primary { background: var(--teal); color: var(--white); padding: .8rem 2rem; font-size: .88rem; font-weight: 600; letter-spacing: .04em; border-radius: var(--radius); border: 1px solid var(--teal); cursor: pointer; transition: background .2s, border-color .2s; display: inline-flex; align-items: center; gap: .5rem; }
+    .btn-primary:hover { background: var(--sky); border-color: var(--sky); }
+    .btn-ghost { color: var(--white); padding: .8rem 2rem; font-size: .88rem; font-weight: 500; border-radius: var(--radius); border: 1px solid rgba(255,255,255,.4); cursor: pointer; transition: border-color .2s, background .2s; display: inline-flex; align-items: center; gap: .5rem; background: transparent; }
+    .btn-ghost:hover { border-color: rgba(255,255,255,.9); background: rgba(255,255,255,.08); }
+    .hero-stats { padding-block: 2rem; border-top: 1px solid rgba(255,255,255,.15); display: flex; flex-wrap: wrap; gap: 2.5rem; position: relative; z-index: 2; }
+    .stat-num { font-family: var(--serif); font-size: 2rem; color: var(--white); line-height: 1; }
+    .stat-num span { color: var(--mint); }
+    .stat-desc { font-size: .75rem; color: rgba(255,255,255,.55); margin-top: .25rem; }
+
+    /* ── SECTION SHARED ─────────────────────────────────────────── */
+    section { padding-block: var(--gap); }
+    .section-head { margin-bottom: clamp(2rem,4vw,3.5rem); }
+    .section-head .label { margin-bottom: .75rem; display: block; }
+    .section-title { font-family: var(--serif); font-size: clamp(1.8rem,3.5vw,2.8rem); line-height: 1.15; letter-spacing: -.02em; }
+    .section-sub { font-size: 1rem; color: var(--muted); font-weight: 300; max-width: 520px; margin-top: .75rem; }
+
+    /* ── ABOUT ──────────────────────────────────────────────────── */
+    .about { background: var(--white); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem,5vw,5rem); align-items: start; }
+    .about-text p { color: var(--muted); font-weight: 300; font-size: .97rem; line-height: 1.8; margin-bottom: 1rem; }
+
+    /* about image mosaic */
+    .about-visuals { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 220px 180px; gap: .75rem; }
+    .about-img { border-radius: 4px; overflow: hidden; position: relative; }
+    .about-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .about-img:hover img { transform: scale(1.04); }
+    .about-img.tall { grid-row: 1 / 3; }
+    .about-img.badge {
+      position: absolute; bottom: 12px; left: 12px;
+      background: var(--navy); color: var(--cream);
+      padding: .4rem .75rem; border-radius: var(--radius);
+      font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase;
+    }
+
+    /* pillars grid below visuals */
+    .about-pillars { display: grid; gap: 1rem; margin-top: 1.5rem; }
+    .pillar { border: 1px solid var(--border); padding: 1.25rem 1.5rem; border-radius: var(--radius); transition: border-color .2s, box-shadow .2s; }
+    .pillar:hover { border-color: var(--sky); box-shadow: 0 0 0 3px rgba(75,163,199,.1); }
+    .pillar-icon { width: 28px; height: 28px; margin-bottom: .75rem; color: var(--teal); }
+    .pillar h3 { font-size: .9rem; font-weight: 600; margin-bottom: .35rem; }
+    .pillar p  { font-size: .82rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+
+    /* ── CAMPUS GALLERY ─────────────────────────────────────────── */
+    .gallery { background: var(--cream); padding-block: var(--gap); }
+    .gallery-strip {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 280px 200px;
+      gap: .75rem;
+      margin-top: 2rem;
+    }
+    .g-cell { border-radius: 4px; overflow: hidden; position: relative; }
+    .g-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+    .g-cell:hover img { transform: scale(1.05); }
+    .g-cell.span-col { grid-column: 1; grid-row: 1 / 3; }
+    .g-cell.span-row { grid-column: 2 / 4; }
+    .g-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(13,27,42,.75), transparent);
+      padding: .75rem 1rem .6rem;
+      font-family: var(--mono); font-size: .62rem; letter-spacing: .1em;
+      text-transform: uppercase; color: rgba(247,244,238,.85);
+    }
+
+    /* ── PROGRAMS ───────────────────────────────────────────────── */
+    .programs { background: var(--white); }
+    .programs-tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+    .tab-btn { font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; padding: .45rem 1rem; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; }
+    .tab-btn.active, .tab-btn:hover { background: var(--navy); border-color: var(--navy); color: var(--cream); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap: 1.25rem; }
+    .card { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color .2s, transform .2s; position: relative; }
+    .card:hover { border-color: var(--sky); transform: translateY(-3px); }
+    /* card image area */
+    .card-thumb { height: 160px; overflow: hidden; background: var(--border); position: relative; }
+    .card-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+    .card:hover .card-thumb img { transform: scale(1.06); }
+    .card-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 50%, rgba(13,27,42,.35)); }
+    .card-body { padding: 1.25rem 1.4rem 1.4rem; }
+    .card-area { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); margin-bottom: .6rem; }
+    .card h3 { font-size: .95rem; font-weight: 600; line-height: 1.3; margin-bottom: .45rem; }
+    .card p  { font-size: .8rem; color: var(--muted); font-weight: 300; line-height: 1.6; }
+    .card-link { display: inline-flex; align-items: center; gap: .35rem; margin-top: .9rem; font-size: .78rem; font-weight: 500; color: var(--teal); transition: gap .2s; }
+    .card-link:hover { gap: .6rem; }
+    .card-link svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── POSTGRAD ───────────────────────────────────────────────── */
+    .postgrad { background: var(--navy); }
+    .postgrad .section-title { color: var(--cream); }
+    .postgrad .section-sub  { color: rgba(247,244,238,.6); }
+    .postgrad .label        { color: var(--mint); }
+    .postgrad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 1px; border: 1px solid rgba(255,255,255,.1); overflow: hidden; border-radius: var(--radius); }
+    .pg-item { padding: 1.75rem; background: rgba(255,255,255,.03); border-right: 1px solid rgba(255,255,255,.07); border-bottom: 1px solid rgba(255,255,255,.07); transition: background .2s; }
+    .pg-item:hover { background: rgba(75,163,199,.1); }
+    .pg-degree { font-family: var(--mono); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; color: var(--sky); margin-bottom: .6rem; }
+    .pg-item h3 { font-family: var(--serif); font-size: 1.1rem; color: var(--cream); line-height: 1.3; }
+
+    /* ── WHY ────────────────────────────────────────────────────── */
+    .why { background: var(--cream); }
+    .why-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 1.5rem; }
+    .why-item { padding: 1.75rem; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }
+    .why-num { font-family: var(--serif); font-size: 3rem; color: var(--mint); line-height: 1; margin-bottom: .75rem; }
+    .why-item h3 { font-size: .95rem; font-weight: 600; margin-bottom: .4rem; }
+    .why-item p  { font-size: .82rem; color: var(--muted); font-weight: 300; line-height: 1.65; }
+
+    /* ── TESTIMONIAL BANNER ─────────────────────────────────────── */
+    .banner {
+      position: relative; overflow: hidden;
+      min-height: 340px; display: flex; align-items: center;
+    }
+    .banner-bg {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1627556704302-624286467c65?w=1400&q=80&auto=format&fit=crop');
+      background-size: cover; background-position: center 25%; filter: brightness(.45);
+    }
+    .banner-content { position: relative; z-index: 2; max-width: 700px; }
+    .banner-content blockquote {
+      font-family: var(--serif); font-size: clamp(1.5rem,3vw,2.2rem);
+      color: var(--white); line-height: 1.3; font-style: italic; margin-bottom: 1.25rem;
+    }
+    .banner-content cite { font-size: .82rem; color: var(--mint); font-style: normal; font-family: var(--mono); letter-spacing: .08em; }
+
+    /* ── CONTACT ────────────────────────────────────────────────── */
+    .contact { background: var(--white); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(2rem,5vw,5rem); align-items: start; }
+    .contact-info .section-head { margin-bottom: 2rem; }
+    .info-row { display: flex; gap: 1rem; align-items: flex-start; padding-block: 1rem; border-top: 1px solid var(--border); }
+    .info-icon { width: 18px; height: 18px; color: var(--teal); flex-shrink: 0; margin-top: 3px; }
+    .info-row strong { font-size: .78rem; font-weight: 600; display: block; margin-bottom: .2rem; }
+    .info-row span   { font-size: .82rem; color: var(--muted); font-weight: 300; line-height: 1.55; }
+    .wa-btn { display: inline-flex; align-items: center; gap: .6rem; margin-top: 1.5rem; background: #25D366; color: #fff; padding: .7rem 1.5rem; border-radius: var(--radius); font-size: .85rem; font-weight: 600; transition: opacity .2s; }
+    .wa-btn:hover { opacity: .88; }
+    .wa-btn svg { width: 18px; height: 18px; }
+    .form-card { background: var(--cream); border: 1px solid var(--border); border-radius: var(--radius); padding: clamp(1.5rem,3vw,2.5rem); }
+    .form-title { font-family: var(--serif); font-size: 1.4rem; margin-bottom: .5rem; }
+    .form-sub { font-size: .82rem; color: var(--muted); margin-bottom: 1.75rem; }
+    .form-grid { display: grid; gap: 1rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .field { display: flex; flex-direction: column; gap: .35rem; }
+    .field label { font-size: .75rem; font-weight: 500; letter-spacing: .04em; }
+    .field input, .field select, .field textarea { font-family: var(--sans); font-size: .88rem; padding: .65rem .9rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--navy); outline: none; transition: border-color .2s, box-shadow .2s; width: 100%; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(27,108,168,.12); }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .form-submit { background: var(--navy); color: var(--cream); border: none; border-radius: var(--radius); font-family: var(--sans); font-size: .88rem; font-weight: 600; letter-spacing: .04em; padding: .85rem 2rem; cursor: pointer; width: 100%; margin-top: .5rem; transition: background .2s; }
+    .form-submit:hover { background: var(--teal); }
+    .form-notice { font-size: .72rem; color: var(--muted); margin-top: .75rem; text-align: center; }
+    .form-success { display: none; flex-direction: column; align-items: center; text-align: center; gap: .75rem; padding: 2rem; }
+    .form-success svg { width: 48px; height: 48px; color: var(--teal); }
+    .form-success h3 { font-family: var(--serif); font-size: 1.5rem; }
+    .form-success p  { font-size: .85rem; color: var(--muted); }
+
+    /* ── FOOTER ─────────────────────────────────────────────────── */
+    .footer { background: var(--navy); padding-block: 3rem 2rem; }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .footer-brand .nav-logo-mark { background: rgba(255,255,255,.08); }
+    .footer-brand .nav-brand strong { color: var(--cream); }
+    .footer-brand .nav-brand small  { color: rgba(247,244,238,.5); }
+    .footer-tagline { font-size: .82rem; color: rgba(247,244,238,.5); margin-top: 1rem; font-weight: 300; line-height: 1.7; max-width: 260px; }
+    .footer-col h4 { font-size: .72rem; font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--mint); margin-bottom: 1rem; }
+    .footer-col ul { display: flex; flex-direction: column; gap: .6rem; }
+    .footer-col li a { font-size: .83rem; color: rgba(247,244,238,.55); transition: color .2s; }
+    .footer-col li a:hover { color: var(--cream); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+    .footer-bottom span { font-size: .72rem; color: rgba(247,244,238,.35); }
+    .footer-bottom a { font-size: .72rem; color: rgba(247,244,238,.5); transition: color .2s; }
+    .footer-bottom a:hover { color: var(--mint); }
+
+    /* ── SCROLL-TO-TOP ──────────────────────────────────────────── */
+    .scroll-top { position: fixed; inset-block-end: 2rem; inset-inline-end: 1.5rem; z-index: 50; width: 42px; height: 42px; background: var(--navy); color: var(--cream); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(13,27,42,.3); transition: opacity .3s, transform .3s, background .2s; opacity: 0; transform: translateY(10px); pointer-events: none; }
+    .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+    .scroll-top:hover { background: var(--teal); }
+    .scroll-top svg { width: 16px; height: 16px; }
+
+    /* ── ANIMATIONS ─────────────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .about-visuals { grid-template-rows: 200px 160px; }
+      .gallery-strip { grid-template-columns: 1fr 1fr; grid-template-rows: 220px 200px; }
+      .gallery-strip .g-cell.span-col { grid-column: auto; grid-row: auto; }
+      .gallery-strip .g-cell.span-row { grid-column: auto; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .footer-grid  { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .burger    { display: flex; }
+      .form-row  { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .about-visuals { grid-template-columns: 1fr; grid-template-rows: 200px 160px 140px; }
+      .about-img.tall { grid-row: auto; }
+      .gallery-strip { grid-template-columns: 1fr; grid-template-rows: 220px 180px 160px 160px 160px; }
+      .footer-grid   { grid-template-columns: 1fr; }
+      .hero-stats    { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────────── -->
+<nav class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="#inicio" class="nav-logo" aria-label="ISUAN inicio">
+      <div class="nav-logo-mark"><span>I</span></div>
+      <div class="nav-brand">
+        <strong>ISUAN</strong>
+        <small>Amado Nervo</small>
+      </div>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#nosotros">Nosotros</a>
+      <a href="#galeria">Campus</a>
+      <a href="#programas">Programas</a>
+      <a href="#posgrado">Posgrado</a>
+      <a href="#por-que">¿Por qué ISUAN?</a>
+      <a href="#contacto" class="nav-cta">Inscríbete</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- mobile menu -->
+<div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menú">
+  <a href="#nosotros"  class="ml">Nosotros</a>
+  <a href="#galeria"   class="ml">Campus</a>
+  <a href="#programas" class="ml">Programas</a>
+  <a href="#posgrado"  class="ml">Posgrado</a>
+  <a href="#por-que"   class="ml">¿Por qué ISUAN?</a>
+  <a href="#contacto"  class="nav-cta ml">Inscríbete</a>
+</div>
+
+<!-- ── HERO (imagen de fondo) ───────────────────────────────────── -->
+<section class="hero" id="inicio">
+  <div class="hero-bg"></div>
+  <div class="hero-body container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="label">Tuxtla Gutiérrez, Chiapas · Desde 1997</span>
+      </div>
+      <h1 class="hero-title">
+        Forma tu futuro<br>
+        con <em>propósito</em><br>
+        y excelencia.
+      </h1>
+      <p class="hero-desc">
+        El Instituto Superior Universitario Amado Nervo ofrece licenciaturas,
+        especialidades, maestrías y doctorados con R.V.O.E. federal, docentes
+        altamente calificados y un compromiso real con tu desarrollo profesional.
+      </p>
+      <div class="hero-actions">
+        <a href="#programas" class="btn-primary">
+          Ver programas
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="#contacto" class="btn-ghost">Solicitar información</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats container">
+    <div class="stat-item">
+      <div class="stat-num">28<span>+</span></div>
+      <div class="stat-desc">Años de experiencia</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1,400<span>+</span></div>
+      <div class="stat-desc">Estudiantes matriculados</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">9</div>
+      <div class="stat-desc">Licenciaturas</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">25<span>+</span></div>
+      <div class="stat-desc">Posgrados y especialidades</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NOSOTROS ──────────────────────────────────────────────────── -->
+<section class="about" id="nosotros">
+  <div class="container">
+    <div class="about-grid">
+
+      <!-- texto -->
+      <div class="about-text reveal">
+        <div class="section-head">
+          <span class="label">Nuestra institución</span>
+          <h2 class="section-title">Educación que transforma comunidades.</h2>
+        </div>
+        <p>Somos una institución privada de educación superior con más de 28 años formando profesionales íntegros y competitivos en Chiapas. Nuestro campus en Tuxtla Gutiérrez cuenta con instalaciones modernas y tecnología de vanguardia.</p>
+        <p>Contamos con reconocimiento de validez oficial de estudios (R.V.O.E.) ante la Secretaría de Educación Pública, garantizando la validez nacional e internacional de todos nuestros títulos y grados académicos.</p>
+        <p>Nuestra misión es brindar educación de calidad y superación académica, formando profesionales con alto sentido ético y responsabilidad social que contribuyan al desarrollo de la región y del país.</p>
+
+        <!-- pilares compactos -->
+        <div class="about-pillars" style="margin-top:2rem;">
+          <div class="pillar">
+            <svg class="pillar-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.63 48.63 0 0 1 12 20.904a48.63 48.63 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 3.741-3.342"/></svg>
+            <h3>R.V.O.E. Federal</h3>
+            <p>Todos nuestros programas tienen reconocimiento oficial de la SEP.</p>
+          </div>
+          <div class="pillar">
+            <svg class="pillar-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+            <h3>Docentes altamente calificados</h3>
+            <p>Cuerpo académico con posgrado y amplia trayectoria profesional.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- mosaico de imágenes -->
+      <div class="about-visuals reveal">
+        <div class="about-img tall" style="position:relative;">
+          <img
+            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=600&q=80&auto=format&fit=crop"
+            alt="Estudiantes universitarios en el campus"
+            loading="lazy"
+          />
+          <span class="badge">28 años · ISUAN</span>
+        </div>
+        <div class="about-img">
+          <img
+            src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=500&q=80&auto=format&fit=crop"
+            alt="Sala de clases universitaria"
+            loading="lazy"
+          />
+        </div>
+        <div class="about-img">
+          <img
+            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=500&q=80&auto=format&fit=crop"
+            alt="Docente universitario en clase"
+            loading="lazy"
+          />
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── GALERÍA DE CAMPUS ─────────────────────────────────────────── -->
+<section class="gallery" id="galeria">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">Vida universitaria</span>
+      <h2 class="section-title">Un campus para crecer.</h2>
+      <p class="section-sub">Instalaciones modernas, comunidad activa y un ambiente diseñado para tu aprendizaje.</p>
+    </div>
+    <div class="gallery-strip reveal">
+      <!-- imagen grande izquierda -->
+      <div class="g-cell span-col">
+        <img
+          src="https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=900&q=80&auto=format&fit=crop"
+          alt="Campus universitario"
+          loading="lazy"
+        />
+        <div class="g-caption">Campus ISUAN · Tuxtla Gutiérrez</div>
+      </div>
+      <!-- fila superior derecha -->
+      <div class="g-cell">
+        <img
+          src="https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=600&q=80&auto=format&fit=crop"
+          alt="Biblioteca universitaria"
+          loading="lazy"
+        />
+        <div class="g-caption">Biblioteca y recursos</div>
+      </div>
+      <div class="g-cell">
+        <img
+          src="https://images.unsplash.com/photo-1532012197267-da84d127e765?w=600&q=80&auto=format&fit=crop"
+          alt="Estudiante estudiando"
+          loading="lazy"
+        />
+        <div class="g-caption">Espacios de estudio</div>
+      </div>
+      <!-- fila inferior derecha -->
+      <div class="g-cell span-row">
+        <img
+          src="https://images.unsplash.com/photo-1597733336794-12d05021d510?w=900&q=80&auto=format&fit=crop"
+          alt="Estudiantes colaborando en equipo"
+          loading="lazy"
+        />
+        <div class="g-caption">Aprendizaje colaborativo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROGRAMAS ─────────────────────────────────────────────────── -->
+<section class="programs" id="programas">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">Oferta académica</span>
+      <h2 class="section-title">Elige tu camino profesional.</h2>
+      <p class="section-sub">Programas diseñados para responder a las necesidades del mercado laboral de hoy.</p>
+    </div>
+
+    <div class="programs-tabs">
+      <button class="tab-btn active" data-tab="salud">Ciencias de la Salud</button>
+      <button class="tab-btn" data-tab="admin">Administración</button>
+      <button class="tab-btn" data-tab="social">Ciencias Sociales</button>
+      <button class="tab-btn" data-tab="ingenieria">Ingeniería</button>
+      <button class="tab-btn" data-tab="educacion">Educación</button>
+    </div>
+
+    <!-- SALUD -->
+    <div class="tab-panel active" id="tab-salud">
+      <div class="cards-grid">
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80&auto=format&fit=crop" alt="Enfermería" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Ciencias de la Salud</div>
+            <h3>Licenciatura en Enfermería</h3>
+            <p>Forma profesionales con habilidades clínicas, comunitarias y de gestión. La carrera con mayor demanda de la institución.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&q=80&auto=format&fit=crop" alt="Trabajo Social" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Ciencias de la Salud</div>
+            <h3>Licenciatura en Trabajo Social</h3>
+            <p>Profesionales comprometidos con el bienestar social, con herramientas para generar cambio en comunidades vulnerables.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="tab-panel" id="tab-admin">
+      <div class="cards-grid">
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80&auto=format&fit=crop" alt="Administración de empresas" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Administración y Negocios</div>
+            <h3>Licenciatura en Administración de Empresas</h3>
+            <p>Competencias para la gestión estratégica de organizaciones públicas y privadas en entornos competitivos.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80&auto=format&fit=crop" alt="Contaduría Pública" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Administración y Negocios</div>
+            <h3>Licenciatura en Contaduría Pública</h3>
+            <p>Contadores con sólidos conocimientos fiscales, financieros y de auditoría para el sector empresarial.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=600&q=80&auto=format&fit=crop" alt="Mercadotecnia y Publicidad" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Administración y Negocios</div>
+            <h3>Mercadotecnia y Publicidad</h3>
+            <p>Combina creatividad y estrategia para impulsar marcas y empresas a través de campañas publicitarias efectivas.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="tab-panel" id="tab-social">
+      <div class="cards-grid">
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1589994965851-a8f479c573a9?w=600&q=80&auto=format&fit=crop" alt="Derecho" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Ciencias Sociales y Derecho</div>
+            <h3>Licenciatura en Derecho</h3>
+            <p>Prepara abogados con visión ética y responsabilidad social para ejercer en el ámbito legal, público y académico.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INGENIERÍA -->
+    <div class="tab-panel" id="tab-ingenieria">
+      <div class="cards-grid">
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80&auto=format&fit=crop" alt="Sistemas Computacionales" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Ingeniería y Tecnología</div>
+            <h3>Ingeniería en Sistemas Computacionales</h3>
+            <p>Diseña, implementa y administra infraestructuras tecnológicas con innovaciones digitales y perspectiva global.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&q=80&auto=format&fit=crop" alt="Seguridad Petrolera" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Ingeniería y Tecnología</div>
+            <h3>Ing. Industrial en Seguridad Petrolera</h3>
+            <p>Ingeniería industrial enfocada en la seguridad y gestión de procesos dentro de la industria petrolera.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=600&q=80&auto=format&fit=crop" alt="Química Petrolera" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Ingeniería y Tecnología</div>
+            <h3>Ingeniería Química Petrolera</h3>
+            <p>Formación en procesos químicos aplicados al sector energético con énfasis en seguridad industrial y sustentabilidad.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDUCACIÓN -->
+    <div class="tab-panel" id="tab-educacion">
+      <div class="cards-grid">
+        <div class="card reveal">
+          <div class="card-thumb">
+            <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&q=80&auto=format&fit=crop" alt="Educación" loading="lazy" />
+          </div>
+          <div class="card-body">
+            <div class="card-area">Educación y Humanidades</div>
+            <h3>Licenciatura en Educación</h3>
+            <p>Desarrolla habilidades avanzadas en enseñanza y gestión educativa, fomentando la innovación en el sector.</p>
+            <a href="#contacto" class="card-link">Más información <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── POSGRADO ───────────────────────────────────────────────────── -->
+<section class="postgrad" id="posgrado">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">Especialización avanzada</span>
+      <h2 class="section-title">Posgrados para los que van más lejos.</h2>
+      <p class="section-sub">Maestrías, especialidades y doctorados para profesionales que buscan liderar.</p>
+    </div>
+    <div class="postgrad-grid reveal">
+      <div class="pg-item"><div class="pg-degree">Maestría</div><h3>Educación y Docencia</h3></div>
+      <div class="pg-item"><div class="pg-degree">Maestría</div><h3>Docencia en Enfermería</h3></div>
+      <div class="pg-item"><div class="pg-degree">Maestría</div><h3>Administración</h3></div>
+      <div class="pg-item"><div class="pg-degree">Maestría</div><h3>Gestión y Administración en Salud Pública</h3></div>
+      <div class="pg-item"><div class="pg-degree">Doctorado</div><h3>Doctorado en Educación</h3></div>
+      <div class="pg-item"><div class="pg-degree">Doctorado</div><h3>Doctorado en Administración</h3></div>
+      <div class="pg-item"><div class="pg-degree">Especialidad</div><h3>Programas de Especialización Profesional</h3></div>
+      <div class="pg-item"><div class="pg-degree">Formación continua</div><h3>Cursos y Diplomados</h3></div>
+    </div>
+    <div style="margin-top:2.5rem;text-align:center">
+      <a href="#contacto" class="btn-primary" style="display:inline-flex;gap:.5rem;align-items:center;">
+        Conocer todos los programas
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── ¿POR QUÉ ISUAN? ───────────────────────────────────────────── -->
+<section class="why" id="por-que">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="label">Nuestras ventajas</span>
+      <h2 class="section-title">¿Por qué elegir ISUAN?</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-item reveal">
+        <div class="why-num">01</div>
+        <h3>Validez oficial garantizada</h3>
+        <p>R.V.O.E. federal en todos los programas. Tu título tiene reconocimiento en todo México y facilita trámites de revalidación internacional.</p>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-num">02</div>
+        <h3>Horarios accesibles</h3>
+        <p>Modalidad discontinua pensada para quienes trabajan. Equilibra tu vida personal, laboral y académica sin sacrificar calidad educativa.</p>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-num">03</div>
+        <h3>Titulación ágil</h3>
+        <p>Implementamos títulos electrónicos XML validados por la SEP, con tiempos de emisión significativamente menores al proceso tradicional.</p>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-num">04</div>
+        <h3>Comunidad y diversidad</h3>
+        <p>Más de 1,400 estudiantes de Chiapas. Ambiente incluyente que valora las lenguas y culturas indígenas de la región.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BANNER CON IMAGEN ─────────────────────────────────────────── -->
+<div class="banner">
+  <div class="banner-bg"></div>
+  <div class="container banner-content reveal">
+    <blockquote>
+      "Brindar educación de calidad formando profesionales íntegros y competitivos que contribuyan al desarrollo de la sociedad."
+    </blockquote>
+    <cite>Misión · Instituto Superior Universitario Amado Nervo</cite>
+  </div>
+</div>
+
+<!-- ── CONTACTO ──────────────────────────────────────────────────── -->
+<section class="contact" id="contacto">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="section-head">
+          <span class="label">Admisiones</span>
+          <h2 class="section-title">Da el primer paso hoy.</h2>
+          <p class="section-sub">Nuestro equipo de admisiones responde en menos de 24 horas.</p>
+        </div>
+        <a href="mailto:admisisiones@isan.mx" class="info-row" style="display:flex;text-decoration:none;">
+          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+          <div><strong>Correo electrónico</strong><span>admisisiones@isan.mx</span></div>
+        </a>
+        <a href="https://wa.me/5219611389301" class="info-row" style="display:flex;text-decoration:none;" target="_blank" rel="noopener">
+          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18h3"/></svg>
+          <div><strong>WhatsApp / Teléfono</strong><span>+52 961 138 9301</span></div>
+        </a>
+        <div class="info-row">
+          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+          <div><strong>Domicilio</strong><span>Calle 2a. Oriente Norte 640, Col. Centro<br>Tuxtla Gutiérrez, Chiapas, C.P. 29000</span></div>
+        </div>
+        <div class="info-row" style="border-bottom:1px solid var(--border);">
+          <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          <div><strong>Clave de Centro de Trabajo</strong><span>07PPL2420E / CCT 07PSU0219B · C.V.E. DSP 4500Z</span></div>
+        </div>
+        <a href="https://wa.me/5219611389301?text=Hola%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n%20sobre%20los%20programas%20de%20ISUAN" target="_blank" rel="noopener" class="wa-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.532 5.856L.057 23.268a.75.75 0 0 0 .916.916l5.412-1.475A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.959 0-3.797-.516-5.391-1.416l-.381-.221-3.982 1.085 1.085-3.982-.221-.381C2.516 15.797 2 13.959 2 12 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+          Escríbenos por WhatsApp
+        </a>
+      </div>
+
+      <!-- Form -->
+      <div class="form-card">
+        <div id="formWrap">
+          <h3 class="form-title">Recibe más información</h3>
+          <p class="form-sub">Completa el formulario y un asesor te contactará pronto.</p>
+          <form class="form-grid" id="contactForm" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="nombre">Nombre completo *</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
+              </div>
+              <div class="field">
+                <label for="telefono">Teléfono / WhatsApp *</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="+52 961 000 0000" required />
+              </div>
+            </div>
+            <div class="field">
+              <label for="email">Correo electrónico *</label>
+              <input type="email" id="email" name="email" placeholder="correo@ejemplo.com" required />
+            </div>
+            <div class="field">
+              <label for="programa">Programa de interés</label>
+              <select id="programa" name="programa">
+                <option value="">— Selecciona un programa —</option>
+                <optgroup label="Licenciaturas">
+                  <option>Lic. en Enfermería</option>
+                  <option>Lic. en Derecho</option>
+                  <option>Lic. en Administración de Empresas</option>
+                  <option>Lic. en Contaduría Pública</option>
+                  <option>Lic. en Mercadotecnia y Publicidad</option>
+                  <option>Lic. en Trabajo Social</option>
+                  <option>Lic. en Educación</option>
+                  <option>Ing. en Sistemas Computacionales</option>
+                  <option>Ing. Industrial en Seguridad Petrolera</option>
+                  <option>Ing. Química Petrolera</option>
+                </optgroup>
+                <optgroup label="Posgrados">
+                  <option>Maestría en Educación y Docencia</option>
+                  <option>Maestría en Docencia en Enfermería</option>
+                  <option>Maestría en Administración</option>
+                  <option>Maestría en Gestión y Adm. en Salud Pública</option>
+                  <option>Doctorado en Educación</option>
+                  <option>Doctorado en Administración</option>
+                </optgroup>
+                <option>Otro / No sé aún</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="mensaje">Mensaje (opcional)</label>
+              <textarea id="mensaje" name="mensaje" placeholder="¿Tienes alguna pregunta específica?"></textarea>
+            </div>
+            <button type="submit" class="form-submit">Enviar solicitud →</button>
+            <p class="form-notice">Al enviar, aceptas que nos comuniquemos contigo para brindarte información sobre nuestros programas.</p>
+          </form>
+        </div>
+        <div class="form-success" id="formSuccess">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+          <h3>¡Solicitud recibida!</h3>
+          <p>Gracias por tu interés en ISUAN. Un asesor se pondrá en contacto contigo en las próximas 24 horas.</p>
+          <a href="https://wa.me/5219611389301" target="_blank" rel="noopener" class="wa-btn" style="margin-top:.75rem">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.121 1.532 5.856L.057 23.268a.75.75 0 0 0 .916.916l5.412-1.475A11.943 11.943 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.959 0-3.797-.516-5.391-1.416l-.381-.221-3.982 1.085 1.085-3.982-.221-.381C2.516 15.797 2 13.959 2 12 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            O escríbenos directamente
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <div class="nav-logo-mark"><span>I</span></div>
+          <div class="nav-brand"><strong>ISUAN</strong><small>Amado Nervo</small></div>
+        </div>
+        <p class="footer-tagline">Instituto Superior Universitario Amado Nervo — formando profesionales íntegros y competitivos en Chiapas desde 1997.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Programas</h4>
+        <ul>
+          <li><a href="#programas">Lic. en Enfermería</a></li>
+          <li><a href="#programas">Lic. en Derecho</a></li>
+          <li><a href="#programas">Administración de Empresas</a></li>
+          <li><a href="#programas">Ing. en Sistemas Computacionales</a></li>
+          <li><a href="#posgrado">Maestrías y Doctorados</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="mailto:admisisiones@isan.mx">admisisiones@isan.mx</a></li>
+          <li><a href="https://wa.me/5219611389301" target="_blank" rel="noopener">+52 961 138 9301</a></li>
+          <li><a href="https://www.facebook.com/isuanmx1" target="_blank" rel="noopener">Facebook: @isuanmx1</a></li>
+          <li><a href="#nosotros">Acerca de ISUAN</a></li>
+          <li><a href="#contacto">Admisiones</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Instituto Superior Universitario Amado Nervo · Tuxtla Gutiérrez, Chiapas</span>
+      <a href="https://www.facebook.com/isuanmx1" target="_blank" rel="noopener">Síguenos en Facebook →</a>
+    </div>
+  </div>
+</footer>
+
+<!-- scroll-to-top -->
+<button class="scroll-top" id="scrollTop" aria-label="Volver arriba">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75 12 8.25l7.5 7.5"/></svg>
+</button>
+
+<script>
+  /* NAV SCROLL */
+  const nav = document.getElementById('nav');
+  const scrollTopBtn = document.getElementById('scrollTop');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+    scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+
+  /* BURGER */
+  const burger = document.getElementById('burger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  burger.addEventListener('click', () => {
+    const open = burger.classList.toggle('open');
+    mobileMenu.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  document.querySelectorAll('.ml').forEach(l => l.addEventListener('click', () => {
+    burger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }));
+
+  /* TABS */
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* FORM */
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!document.getElementById('nombre').value.trim() ||
+        !document.getElementById('email').value.trim() ||
+        !document.getElementById('telefono').value.trim()) {
+      alert('Por favor completa los campos obligatorios (nombre, correo y teléfono).');
+      return;
+    }
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'flex';
+  });
+
+  /* SCROLL TO TOP */
+  scrollTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  /* REVEAL ON SCROLL */
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('in'), i * 80);
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
